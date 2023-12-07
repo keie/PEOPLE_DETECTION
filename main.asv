@@ -1,0 +1,69 @@
+% % Create a VideoReader object to read the MP4 file
+% videoObj = VideoReader('/Users/appleuser/Desktop/pazmany/algorithms_image_processing/assignment_2/video/input_video.mp4');
+% 
+% % Create a People Detector object
+% peopleDetector = vision.PeopleDetector;
+% 
+% % Read and process each frame of the video
+% while hasFrame(videoObj)
+%     frame = readFrame(videoObj);  % Read a single frame
+%     [bboxes, scores] = peopleDetector.step(frame); % Detect people
+% 
+%     % Draw bounding boxes around detected people with different colors
+%     if ~isempty(bboxes)
+%         % Generate a unique color for each bounding box
+%         colors = rand(size(bboxes, 1), 3); % RGB colors
+% 
+%         for i = 1:size(bboxes, 1)
+%             % Draw the bounding box with a unique color
+%             frame = insertObjectAnnotation(frame, 'rectangle', ...
+%                 bboxes(i,:), scores(i), 'Color', colors(i,:));
+%         end
+%     end
+% 
+%     imshow(frame); % Display the annotated frame
+%     pause(1/videoObj.FrameRate); % Pause for the duration of one frame
+% end
+
+
+
+
+% Create a VideoReader object to read the MP4 file
+videoObj = VideoReader('input_video.mp4');
+
+% Create a People Detector object
+peopleDetector = vision.PeopleDetector;
+
+% Define a set of strong colors for the bounding boxes
+colors = [
+    1 1 0; % Yellow
+    1 0 0; % Red
+    0 1 0; % Green
+    0 0 1; % Blue
+    1 0 1; % Magenta
+    0 1 1; % Cyan
+];
+
+% Counter for color cycling
+colorIndex = 1;
+
+% Read and process each frame of the video
+while hasFrame(videoObj)
+    frame = readFrame(videoObj);  % Read a single frame
+    [bboxes, scores] = peopleDetector.step(frame); % Detect people
+
+    % Draw bounding boxes around detected people with different colors
+    for i = 1:size(bboxes, 1)
+        % Cycle through the color array
+        color = colors(colorIndex, :);
+        frame = insertObjectAnnotation(frame, 'rectangle', ...
+            bboxes(i,:), scores(i), 'Color', color, 'TextBoxOpacity',0.8,'FontSize',18);
+
+        % Update color index
+        colorIndex = mod(colorIndex, size(colors, 1)) + 1;
+    end
+
+    imshow(frame); % Display the annotated frame
+    pause(1/videoObj.FrameRate); % Pause for the duration of one frame
+end
+
